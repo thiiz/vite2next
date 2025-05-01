@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export async function updatePackageJson(targetDir) {
-    console.log(chalk.blue('Step 8: Updating package.json scripts...'));
+    console.log(chalk.blue('Step 9: Updating package.json scripts...'));
 
     const packageJsonPath = path.join(targetDir, 'package.json');
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
