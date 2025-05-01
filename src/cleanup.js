@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export async function cleanupViteFiles(targetDir) {
-    console.log(chalk.blue('Step 9: Cleaning up Vite files...'));
+    console.log(chalk.blue('Step 1: Cleaning up Vite files...'));
 
     const filesToRemove = [
         'main.tsx',
