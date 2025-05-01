@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export async function updateTsConfig(targetDir) {
-    console.log(chalk.blue('Step 3: Updating TypeScript configuration...'));
+    console.log(chalk.blue('Step 4: Updating TypeScript configuration...'));
 
     const tsConfigPath = path.join(targetDir, 'tsconfig.json');
 
