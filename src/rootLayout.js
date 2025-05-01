@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 
 export async function createRootLayout(targetDir) {
-  console.log(chalk.blue('Step 4: Creating root layout...'));
+  console.log(chalk.blue('Step 5: Creating root layout...'));
 
   // Create app directory if it doesn't exist
   const appDir = path.join(targetDir, 'app');
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
 
 ` : ''}export default function RootLayout({
   children,
-}: ${usesTypeScript ? '{' : '{'} 
+}${usesTypeScript ? `: {
   children: React.ReactNode
-${usesTypeScript ? '}' : '}'}) {
+}` : ''}) {
   return (
     <html lang="en">
       <body>
@@ -155,11 +155,13 @@ export const metadata: Metadata = {
 ${metadataContent.join('\n')}
 }
 
+` : hasScripts ? `import Script from 'next/script'
+
 ` : ''}export default function RootLayout({
   children,
-}: ${usesTypeScript ? '{' : '{'} 
+}${usesTypeScript ? `: {
   children: React.ReactNode
-${usesTypeScript ? '}' : '}'}) {
+}` : ''}) {
   return (
     <html lang="en">
       <body>
