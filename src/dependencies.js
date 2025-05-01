@@ -7,7 +7,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 export async function migrateDependencies(targetDir, skipInstall) {
-    console.log(chalk.blue('Step 1: Installing Next.js dependencies...'));
+    console.log(chalk.blue('Step 2: Installing Next.js dependencies...'));
 
     const packageJsonPath = path.join(targetDir, 'package.json');
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
