@@ -1,118 +1,118 @@
 # vite2next
 
-Uma ferramenta de linha de comando que migra automaticamente projetos Vite para Next.js seguindo o [guia oficial de migração do Next.js](https://nextjs.org/docs/app/building-your-application/upgrading/from-vite).
+A command-line tool that automatically migrates Vite projects to Next.js following the [official Next.js migration guide](https://nextjs.org/docs/app/building-your-application/upgrading/from-vite).
 
-## Funcionalidades
+## Features
 
-- Instala dependências do Next.js
-- Cria arquivo de configuração do Next.js
-- Atualiza configuração do TypeScript
-- Cria layout raiz baseado no seu index.html existente
-- Configura página de entrada para manter o padrão SPA (Single Page Application)
-- Ajuda com importações de imagens estáticas
-- Migra variáveis de ambiente do formato Vite para Next.js
-- Atualiza scripts no package.json
-- Remove arquivos relacionados ao Vite
-- Configura compatibilidade com React Router
-- Migra assets estáticos
+- Installs Next.js dependencies
+- Creates Next.js configuration file
+- Updates TypeScript configuration
+- Creates root layout based on your existing index.html
+- Sets up entry page to maintain SPA (Single Page Application) pattern
+- Helps with static image imports
+- Migrates environment variables from Vite format to Next.js
+- Updates scripts in package.json
+- Removes Vite-related files
+- Configures compatibility with React Router
+- Migrates static assets
 
-## Instalação
+## Installation
 
-### Instalação Global
+### Global Installation
 
 ```bash
 npm install -g vite2next
 ```
 
-### Uso Local (sem instalação)
+### Local Usage (without installation)
 
 ```bash
 npx vite2next
 ```
 
-## Uso
+## Usage
 
-Navegue até o diretório do seu projeto Vite e execute:
+Navigate to your Vite project directory and run:
 
 ```bash
 vite2next
 ```
 
-A ferramenta irá guiá-lo através do processo de migração com prompts interativos.
+The tool will guide you through the migration process with interactive prompts.
 
-### Opções
+### Options
 
-- `-y, --yes`: Pula todas as confirmações.
-- `--skip-install`: Pula a instalação de dependências.
-- `[project-directory]`: Especifica um diretório alvo (o padrão é o diretório atual).
+- `-y, --yes`: Skip all confirmations.
+- `--skip-install`: Skip dependency installation.
+- `[project-directory]`: Specify a target directory (defaults to current directory).
 
-Exemplos:
+Examples:
 
 ```bash
-# Migrar o diretório atual
+# Migrate current directory
 vite2next
 
-# Migrar um diretório específico
-vite2next ./meu-projeto-vite
+# Migrate a specific directory
+vite2next ./my-vite-project
 
-# Pular todas as confirmações
+# Skip all confirmations
 vite2next -y
 
-# Pular instalação de dependências
+# Skip dependency installation
 vite2next --skip-install
 ```
 
-## Etapas da Migração
+## Migration Steps
 
-A ferramenta segue o guia oficial de migração do Next.js e realiza estas etapas:
+The tool follows the official Next.js migration guide and performs these steps:
 
-1. **Instalar Dependência do Next.js**: Adiciona Next.js às dependências do projeto.
-2. **Criar Configuração do Next.js**: Cria um arquivo `next.config.mjs` com base nas configurações do Vite.
-3. **Atualizar Configuração TypeScript**: Ajusta seu `tsconfig.json` se você estiver usando TypeScript.
-4. **Criar Layout Raiz**: Cria um componente de layout raiz baseado no seu `index.html`.
-5. **Criar Página de Entrada**: Configura páginas adequadas usando o App Router.
-6. **Atualizar Importações de Imagens Estáticas**: Adiciona suporte e helpers para importação de imagens.
-7. **Migrar Variáveis de Ambiente**: Atualiza suas variáveis de ambiente de `VITE_` para `NEXT_PUBLIC_`.
-8. **Atualizar Scripts no package.json**: Atualiza scripts para usar comandos Next.js.
-9. **Limpeza**: Remove arquivos e dependências relacionados ao Vite.
-10. **Configurar Compatibilidade com React Router**: Facilita a migração do React Router para o Next.js App Router.
-11. **Migrar Assets Estáticos**: Ajuda a configurar corretamente os assets estáticos no Next.js.
+1. **Install Next.js Dependency**: Adds Next.js to the project dependencies.
+2. **Create Next.js Configuration**: Creates a `next.config.mjs` file based on Vite settings.
+3. **Update TypeScript Configuration**: Adjusts your `tsconfig.json` if you're using TypeScript.
+4. **Create Root Layout**: Creates a root layout component based on your `index.html`.
+5. **Create Entry Page**: Sets up appropriate pages using the App Router.
+6. **Update Static Image Imports**: Adds support and helpers for image importing.
+7. **Migrate Environment Variables**: Updates your environment variables from `VITE_` to `NEXT_PUBLIC_`.
+8. **Update Scripts in package.json**: Updates scripts to use Next.js commands.
+9. **Cleanup**: Removes Vite-related files and dependencies.
+10. **Configure React Router Compatibility**: Facilitates migration from React Router to Next.js App Router.
+11. **Migrate Static Assets**: Helps properly configure static assets in Next.js.
 
-## Após a Migração
+## After Migration
 
-Após a conclusão da migração, sua aplicação estará rodando no Next.js como um Single Page Application. A partir daí, você pode adotar incrementalmente mais recursos do Next.js:
+After migration is complete, your application will be running on Next.js as a Single Page Application. From there, you can incrementally adopt more Next.js features:
 
-- Migrar do React Router para o App Router do Next.js
-- Otimizar imagens com o componente `<Image>`
-- Otimizar fontes com `next/font`
-- Otimizar scripts com o componente `<Script>`
-- Adicionar Server Components e busca de dados do lado do servidor
-- Adicionar rotas de API
-- E muito mais!
+- Migrate from React Router to Next.js App Router
+- Optimize images with the `<Image>` component
+- Optimize fonts with `next/font`
+- Optimize scripts with the `<Script>` component
+- Add Server Components and server-side data fetching
+- Add API routes
+- And much more!
 
-Para instruções detalhadas sobre como adaptar seu código depois da migração, consulte os arquivos de documentação criados na pasta `docs/` do seu projeto.
+For detailed instructions on how to adapt your code after migration, refer to the documentation files created in the `docs/` folder of your project.
 
-## Como Usar em Seus Próprios Projetos
+## How to Use in Your Own Projects
 
-Para usar esta ferramenta em seus projetos, você tem algumas opções:
+To use this tool in your projects, you have several options:
 
-1. **Como dependência global**: Instale-a com `npm install -g vite2next` e use em qualquer projeto
+1. **As a global dependency**: Install it with `npm install -g vite2next` and use in any project
    
-2. **Como dependência de desenvolvimento**: Adicione ao seu projeto com `npm install --save-dev vite2next`
+2. **As a development dependency**: Add to your project with `npm install --save-dev vite2next`
 
-3. **Executar diretamente**: Use `npx vite2next` em qualquer projeto sem instalação prévia
+3. **Run directly**: Use `npx vite2next` in any project without prior installation
 
-4. **Integrar ao seu próprio CLI**: Importe os módulos específicos que você precisa:
+4. **Integrate into your own CLI**: Import the specific modules you need:
 
 ```javascript
 import { updatePackageJson } from 'vite2next/api';
 import { migrateDependencies } from 'vite2next/api';
 
-// Use em seu próprio script
-await updatePackageJson('./meu-projeto');
-await migrateDependencies('./meu-projeto', false);
+// Use in your own script
+await updatePackageJson('./my-project');
+await migrateDependencies('./my-project', false);
 ```
 
-## Licença
+## License
 
 MIT 
