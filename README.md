@@ -1,4 +1,4 @@
-# vite-to-next
+# vite2next
 
 Uma ferramenta de linha de comando que migra automaticamente projetos Vite para Next.js seguindo o [guia oficial de migração do Next.js](https://nextjs.org/docs/app/building-your-application/upgrading/from-vite).
 
@@ -21,13 +21,13 @@ Uma ferramenta de linha de comando que migra automaticamente projetos Vite para 
 ### Instalação Global
 
 ```bash
-npm install -g vite-to-next
+npm install -g vite2next
 ```
 
 ### Uso Local (sem instalação)
 
 ```bash
-npx vite-to-next
+npx vite2next
 ```
 
 ## Uso
@@ -35,7 +35,7 @@ npx vite-to-next
 Navegue até o diretório do seu projeto Vite e execute:
 
 ```bash
-vite-to-next
+vite2next
 ```
 
 A ferramenta irá guiá-lo através do processo de migração com prompts interativos.
@@ -50,16 +50,16 @@ Exemplos:
 
 ```bash
 # Migrar o diretório atual
-vite-to-next
+vite2next
 
 # Migrar um diretório específico
-vite-to-next ./meu-projeto-vite
+vite2next ./meu-projeto-vite
 
 # Pular todas as confirmações
-vite-to-next -y
+vite2next -y
 
 # Pular instalação de dependências
-vite-to-next --skip-install
+vite2next --skip-install
 ```
 
 ## Etapas da Migração
@@ -96,17 +96,17 @@ Para instruções detalhadas sobre como adaptar seu código depois da migração
 
 Para usar esta ferramenta em seus projetos, você tem algumas opções:
 
-1. **Como dependência global**: Instale-a com `npm install -g vite-to-next` e use em qualquer projeto
+1. **Como dependência global**: Instale-a com `npm install -g vite2next` e use em qualquer projeto
    
-2. **Como dependência de desenvolvimento**: Adicione ao seu projeto com `npm install --save-dev vite-to-next`
+2. **Como dependência de desenvolvimento**: Adicione ao seu projeto com `npm install --save-dev vite2next`
 
-3. **Executar diretamente**: Use `npx vite-to-next` em qualquer projeto sem instalação prévia
+3. **Executar diretamente**: Use `npx vite2next` em qualquer projeto sem instalação prévia
 
 4. **Integrar ao seu próprio CLI**: Importe os módulos específicos que você precisa:
 
 ```javascript
-import { updatePackageJson } from 'vite-to-next/api';
-import { migrateDependencies } from 'vite-to-next/api';
+import { updatePackageJson } from 'vite2next/api';
+import { migrateDependencies } from 'vite2next/api';
 
 // Use em seu próprio script
 await updatePackageJson('./meu-projeto');

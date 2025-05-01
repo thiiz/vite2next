@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "module",
     "bin": {
-        "vite-to-next": "./index.js"
+        "vite2next": "./index.js"
     },
     "scripts": {
         "start": "node index.js",
@@ -37,10 +37,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/vite-to-next"
+        "url": "https://github.com/thiiz/vite2next"
     },
     "bugs": {
-        "url": "https://github.com/yourusername/vite-to-next/issues"
+        "url": "https://github.com/thiiz/vite2next/issues"
     },
-    "homepage": "https://github.com/yourusername/vite-to-next#readme"
+    "homepage": "https://github.com/thiiz/vite2next#readme"
 }

@@ -18,7 +18,7 @@ import { migrateStaticAssets } from './src/staticAssets.js';
 import { updateTsConfig } from './src/tsConfig.js';
 
 function displayBanner() {
-    console.log(chalk.blue.bold('Vite to Next.js Migration Tool'));
+    console.log(chalk.blue.bold('vite2next - Vite to Next.js Migration Tool'));
     console.log(chalk.gray('Following the official Next.js migration guide\n'));
 }
 
@@ -147,7 +147,7 @@ async function main() {
     displayBanner();
 
     program
-        .name('vite-to-next')
+        .name('vite2next')
         .description('CLI to migrate Vite projects to Next.js')
         .version('1.0.0')
         .argument('[project-directory]', 'Directory of the Vite project to migrate', '.')
