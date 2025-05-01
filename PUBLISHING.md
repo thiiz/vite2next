@@ -71,12 +71,12 @@ The following files control how your package is published:
 
 The key parts of your package that make it installable with `npm i -g vite2next` are:
 
-1. The shebang line (`#!/usr/bin/env node`) at the top of the main executable file (`index.js`).
+1. The shebang line (`#!/usr/bin/env node`) at the top of the main executable file (`cli.js`).
 2. The `bin` field in your `package.json` that maps the command name to the script file:
 
 ```json
 "bin": {
-  "vite2next": "./index.js"
+  "vite2next": "cli.js"
 }
 ```
 
