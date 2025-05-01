@@ -1,0 +1,46 @@
+{
+    "name": "vite2next",
+    "version": "1.0.0",
+    "description": "Automated tool to migrate Vite projects to Next.js",
+    "main": "index.js",
+    "type": "module",
+    "bin": {
+        "vite-to-next": "./index.js"
+    },
+    "scripts": {
+        "start": "node index.js",
+        "dev": "node index.js"
+    },
+    "exports": {
+        ".": "./index.js",
+        "./api": "./src/cli.js"
+    },
+    "keywords": [
+        "vite",
+        "next.js",
+        "migration",
+        "cli",
+        "react"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "fs-extra": "^11.1.1",
+        "glob": "^10.3.10",
+        "chalk": "^5.3.0",
+        "inquirer": "^9.2.12",
+        "commander": "^11.1.0",
+        "jsdom": "^22.1.0"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/vite-to-next"
+    },
+    "bugs": {
+        "url": "https://github.com/yourusername/vite-to-next/issues"
+    },
+    "homepage": "https://github.com/yourusername/vite-to-next#readme"
+}
