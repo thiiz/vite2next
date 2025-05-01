@@ -6,8 +6,10 @@ import path from 'path';
 export async function createRootLayout(targetDir) {
   console.log(chalk.blue('Step 5: Creating root layout...'));
 
-  // Create app directory if it doesn't exist
-  const appDir = path.join(targetDir, 'app');
+  // Create src/app directory if it doesn't exist
+  const srcDir = path.join(targetDir, 'src');
+  await fs.ensureDir(srcDir);
+  const appDir = path.join(srcDir, 'app');
   await fs.ensureDir(appDir);
 
   // Check if layout.tsx already exists
@@ -187,7 +189,7 @@ ${hasScripts ? scripts.join('\n') : ''}
 
   // Write layout file
   await fs.writeFile(finalLayoutPath, layout);
-  console.log(chalk.green(`√ Created app/layout.${extension}`));
+  console.log(chalk.green(`√ Created src/app/layout.${extension}`));
 
   console.log(chalk.green('✓ Step 4 completed'));
   return true;
