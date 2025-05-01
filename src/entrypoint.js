@@ -4,7 +4,7 @@ import * as glob from 'glob';
 import path from 'path';
 
 export async function createEntrypoint(targetDir) {
-    console.log(chalk.blue('Step 5: Creating entrypoint page...'));
+    console.log(chalk.blue('Step 6: Creating entrypoint page...'));
 
     // Create app directory if it doesn't exist
     const appDir = path.join(targetDir, 'app');
