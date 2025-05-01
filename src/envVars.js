@@ -4,7 +4,7 @@ import * as glob from 'glob';
 import path from 'path';
 
 export async function migrateEnvVars(targetDir) {
-    console.log(chalk.blue('Step 7: Migrating environment variables...'));
+    console.log(chalk.blue('Step 8: Migrating environment variables...'));
 
     // Process .env files
     const envFiles = await glob.glob('.env*', { cwd: targetDir });
