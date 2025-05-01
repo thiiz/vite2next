@@ -4,7 +4,7 @@ import * as glob from 'glob';
 import path from 'path';
 
 export async function updateImageImports(targetDir) {
-    console.log(chalk.blue('Step 6: Updating static image imports...'));
+    console.log(chalk.blue('Step 7: Updating static image imports...'));
 
     try {
         // Find all JS/TS/JSX/TSX files
