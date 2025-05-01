@@ -1,6 +1,6 @@
 {
     "name": "vite2next",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Automated tool to migrate Vite projects to Next.js",
     "main": "index.js",
     "type": "module",
