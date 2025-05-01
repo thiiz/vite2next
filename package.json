@@ -8,8 +8,8 @@
         "vite2next": "./index.js"
     },
     "scripts": {
-        "start": "node index.js",
-        "dev": "node index.js"
+        "start": "node ./src/cli.js",
+        "dev": "node ./src/cli.js"
     },
     "exports": {
         ".": "./index.js",
