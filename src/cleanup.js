@@ -84,6 +84,6 @@ export async function cleanupViteFiles(targetDir) {
         }
     }
 
-    console.log(chalk.green('✓ Step 9 completed'));
+    console.log(chalk.green('✓ Step 1 completed'));
     return true;
 } 
