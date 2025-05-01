@@ -113,6 +113,7 @@ async function findGlobalCss(targetDir) {
         const filename = path.basename(file).toLowerCase();
         return filename === 'index.css' ||
             filename === 'global.css' ||
+            filename === 'globals.css' ||
             filename === 'app.css' ||
             filename === 'style.css' ||
             filename === 'styles.css';
