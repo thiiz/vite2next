@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export async function createNextConfig(targetDir) {
-    console.log(chalk.blue('Step 2: Creating Next.js configuration file...'));
+    console.log(chalk.blue('Step 3: Creating Next.js configuration file...'));
 
     const nextConfigPath = path.join(targetDir, 'next.config.mjs');
 
