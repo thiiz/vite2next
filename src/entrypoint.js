@@ -3,24 +3,25 @@ import fs from 'fs-extra';
 import * as glob from 'glob';
 import path from 'path';
 
-export async function createEntrypoint(targetDir) {
+export async function createEntrypoint(targetDir, projectSetup) {
     console.log(chalk.blue('Step 6: Creating entrypoint page...'));
 
-    // Create app directory if it doesn't exist
-    const appDir = path.join(targetDir, 'app');
+    // Create src/app directory if it doesn't exist
+    const srcDir = path.join(targetDir, 'src');
+    await fs.ensureDir(srcDir);
+
+    // Use custom app directory if specified, otherwise default to src/app
+    const appDir = projectSetup.customAppDir
+        ? path.join(targetDir, projectSetup.customAppDir)
+        : path.join(srcDir, 'app');
+
     await fs.ensureDir(appDir);
 
-    const usesTypeScript = fs.existsSync(path.join(targetDir, 'tsconfig.json'));
+    const usesTypeScript = projectSetup.usesTypeScript;
     const extension = usesTypeScript ? 'tsx' : 'jsx';
 
-    // First, try to detect if there's a more appropriate page structure
-    // Check for React Router usage to decide on approach
-    const packageJsonPath = path.join(targetDir, 'package.json');
-    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
-    const usesReactRouter = packageJson.dependencies?.['react-router-dom'] || packageJson.dependencies?.['react-router'];
-
-    // Default to catchall route approach for SPA style
-    if (usesReactRouter) {
+    // Default to catchall route approach for SPA style with React Router
+    if (projectSetup.usesReactRouter) {
         console.log(chalk.yellow('i React Router detected - using catchall route approach for compatibility'));
         await createCatchAllPage(targetDir, appDir, extension);
     } else {
@@ -45,7 +46,7 @@ export async function createEntrypoint(targetDir) {
         }
     }
 
-    console.log(chalk.green('✓ Step 5 completed'));
+    console.log(chalk.green('✓ Step 6 completed'));
     return true;
 }
 
@@ -140,26 +141,35 @@ async function createCatchAllPage(targetDir, appDir, extension) {
         return;
     }
 
-    // Find global CSS file for importing
-    const globalCssFile = await findGlobalCss(targetDir);
-    let cssImport = '';
-
-    if (globalCssFile) {
-        // Normalize path to use forward slashes for imports
-        const normalizedCssPath = `../../${globalCssFile}`.replace(/\\/g, '/');
-        cssImport = `import '${normalizedCssPath}'\n`;
-        console.log(chalk.gray(`Found global CSS file: ${globalCssFile}`));
-    }
-
     // Find the app component
     let appPath = await findAppComponent(targetDir);
     if (!appPath) {
         console.log(chalk.yellow('! Could not find App component file, you may need to adjust the import path manually'));
         appPath = 'App';
     } else {
-        // Convert to import path with normalized slashes
-        appPath = '../../' + appPath.replace(/\.[jt]sx?$/, '');
+        // Log the found path before processing
+        console.log(chalk.gray(`Original App component path: ${appPath}`));
+
+        // Normalize backslashes to forward slashes
         appPath = appPath.replace(/\\/g, '/');
+
+        // Remove file extension
+        const pathWithoutExt = appPath.replace(/\.[jt]sx?$/, '');
+
+        // For paths starting with src/, we need to remove the src/ prefix
+        if (pathWithoutExt === 'src/App' || pathWithoutExt === 'src/app' || pathWithoutExt.startsWith('src/App/') || pathWithoutExt.startsWith('src/app/')) {
+            // Remove 'src/' prefix and add '../../' to go up from app/[[...slug]]/ to project root
+            appPath = '../../' + pathWithoutExt.substring(4);
+        } else if (pathWithoutExt.startsWith('src/')) {
+            // For other files in src directory
+            appPath = '../../' + pathWithoutExt.substring(4);
+        } else {
+            // For paths not in src directory, still need to go up from app/[[...slug]]/ to project root
+            appPath = '../../' + pathWithoutExt;
+        }
+
+        // Log the final import path for debugging
+        console.log(chalk.gray(`Import path for App component: ${appPath}`));
     }
 
     // Create client.tsx/jsx
@@ -175,13 +185,38 @@ export function ClientOnly() {
 }`;
 
     await fs.writeFile(clientFile, clientContent);
-    console.log(chalk.green(`√ Created app/[[...slug]]/client.${extension}`));
+    console.log(chalk.green(`√ Created src/app/[[...slug]]/client.${extension}`));
 
-    // Create page.tsx/jsx
-    const pageContent = `${cssImport}import { ClientOnly } from './client'
+    // Check for files in the src/pages directory
+    const pagesDir = path.join(targetDir, 'src', 'pages');
+    let slugs = [{ slug: [''] }]; // Default slug
+
+    if (fs.existsSync(pagesDir)) {
+        try {
+            const pageFiles = await fs.readdir(pagesDir);
+            const pageRoutes = pageFiles
+                .filter(file => /\.(jsx|tsx|js|ts)$/.test(file) && !file.startsWith('_') && file !== 'index.tsx' && file !== 'index.jsx' && file !== 'index.js' && file !== 'index.ts')
+                .map(file => {
+                    // Remove extension and convert to lowercase
+                    const pageName = path.basename(file, path.extname(file)).toLowerCase();
+                    return { slug: [pageName] };
+                });
+
+            if (pageRoutes.length > 0) {
+                // Add the default route too
+                slugs = [...pageRoutes, { slug: [''] }];
+                console.log(chalk.gray(`Found page routes: ${JSON.stringify(pageRoutes)}`));
+            }
+        } catch (error) {
+            console.error(chalk.yellow(`Error reading pages directory: ${error.message}`));
+        }
+    }
+
+    // Create page.tsx/jsx with dynamic slugs from pages directory
+    const pageContent = `import { ClientOnly } from './client'
 
 export function generateStaticParams() {
-  return [{ slug: [''] }]
+  return ${JSON.stringify(slugs, null, 2)}
 }
 
 export default function Page() {
@@ -189,33 +224,42 @@ export default function Page() {
 }`;
 
     await fs.writeFile(pageFile, pageContent);
-    console.log(chalk.green(`√ Created app/[[...slug]]/page.${extension}`));
+    console.log(chalk.green(`√ Created src/app/[[...slug]]/page.${extension}`));
 }
 
 async function createDirectPage(targetDir, appDir, extension, appComponentPath) {
     // Create a direct page.tsx/jsx for simpler apps
     const pageFile = path.join(appDir, `page.${extension}`);
 
-    // Find global CSS file for importing
-    const globalCssFile = await findGlobalCss(targetDir);
-    let cssImport = '';
+    // Log the component path before processing
+    console.log(chalk.gray(`Original App component path: ${appComponentPath}`));
 
-    if (globalCssFile) {
-        // Normalize path to use forward slashes for imports
-        const normalizedCssPath = `../${globalCssFile}`.replace(/\\/g, '/');
-        cssImport = `import '${normalizedCssPath}'\n`;
-        console.log(chalk.gray(`Found global CSS file: ${globalCssFile}`));
-    }
+    // Normalize backslashes to forward slashes
+    appComponentPath = appComponentPath.replace(/\\/g, '/');
 
     // Convert to import path relative to app directory
-    let appImportPath = '../' + appComponentPath.replace(/\.[jt]sx?$/, '');
-    // Normalize path to use forward slashes for imports
-    appImportPath = appImportPath.replace(/\\/g, '/');
+    let appImportPath;
+    const pathWithoutExt = appComponentPath.replace(/\.[jt]sx?$/, '');
+
+    // For paths starting with src/, we need to remove the src/ prefix
+    if (pathWithoutExt === 'src/App' || pathWithoutExt === 'src/app' || pathWithoutExt.startsWith('src/App/') || pathWithoutExt.startsWith('src/app/')) {
+        // Remove 'src/' prefix and add '../' to go up from app/ to project root
+        appImportPath = '../' + pathWithoutExt.substring(4);
+    } else if (pathWithoutExt.startsWith('src/')) {
+        // For other files in src directory
+        appImportPath = '../' + pathWithoutExt.substring(4);
+    } else {
+        // For paths not in src directory, still need to go up from app/ to project root
+        appImportPath = '../' + pathWithoutExt;
+    }
+
+    // Log the final import path for debugging
+    console.log(chalk.gray(`Import path for App component: ${appImportPath}`));
 
     // Create page content
     const pageContent = `'use client'
 
-${cssImport}import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic'
 
 const App = dynamic(() => import('${appImportPath}'), { ssr: false })
 
@@ -224,28 +268,17 @@ export default function Home() {
 }`;
 
     await fs.writeFile(pageFile, pageContent);
-    console.log(chalk.green(`√ Created app/page.${extension}`));
+    console.log(chalk.green(`√ Created src/app/page.${extension}`));
 }
 
 async function createFallbackPage(targetDir, appDir, extension) {
     // Create a fallback page when no App component is found
     const pageFile = path.join(appDir, `page.${extension}`);
 
-    // Find global CSS file for importing
-    const globalCssFile = await findGlobalCss(targetDir);
-    let cssImport = '';
-
-    if (globalCssFile) {
-        // Normalize path to use forward slashes for imports
-        const normalizedCssPath = `../${globalCssFile}`.replace(/\\/g, '/');
-        cssImport = `import '${normalizedCssPath}'\n`;
-        console.log(chalk.gray(`Found global CSS file: ${globalCssFile}`));
-    }
-
     // Create a simple fallback page
     const pageContent = `'use client'
 
-${cssImport}export default function Home() {
+export default function Home() {
   return (
     <div style={{ 
       display: 'flex', 
@@ -272,5 +305,5 @@ ${cssImport}export default function Home() {
 }`;
 
     await fs.writeFile(pageFile, pageContent);
-    console.log(chalk.green(`√ Created fallback app/page.${extension}`));
-} 
+    console.log(chalk.green(`√ Created fallback src/app/page.${extension}`));
+}
