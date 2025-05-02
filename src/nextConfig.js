@@ -2,128 +2,241 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 
-export async function createNextConfig(targetDir) {
-    console.log(chalk.blue('Step 3: Creating Next.js configuration file...'));
+export async function createNextConfig(targetDir, projectSetup) {
+    console.log(chalk.blue('Step 3: Creating Next.js configuration...'));
 
-    const nextConfigPath = path.join(targetDir, 'next.config.mjs');
-
-    // Check if next.config.mjs already exists
+    const nextConfigPath = path.join(targetDir, 'next.config.js');
     if (fs.existsSync(nextConfigPath)) {
-        console.log(chalk.yellow('i next.config.mjs already exists, skipping creation'));
+        console.log(chalk.yellow('i next.config.js already exists, skipping creation'));
         return true;
     }
 
-    // Try to find and parse Vite config to migrate settings
-    let viteConfig = null;
-    const viteConfigPaths = [
-        path.join(targetDir, 'vite.config.js'),
-        path.join(targetDir, 'vite.config.ts'),
-        path.join(targetDir, 'vite.config.mjs'),
-        path.join(targetDir, 'vite.config.mts')
-    ];
+    let configContent = '';
 
-    for (const configPath of viteConfigPaths) {
-        if (fs.existsSync(configPath)) {
-            try {
-                // We can't directly import the config due to potential dependencies
-                // Just read it as text and extract some common patterns
-                const configContent = await fs.readFile(configPath, 'utf8');
+    // Create appropriate Next.js config based on CSS framework and other requirements
+    if (projectSetup.cssFramework === 'styled-components') {
+        // For styled-components, create a registry file
+        await createStyledComponentsRegistry(targetDir, projectSetup.usesTypeScript);
 
-                // Try to extract basePath and any other useful settings
-                viteConfig = parseViteConfig(configContent);
-                console.log(chalk.gray(`Found Vite config at ${path.basename(configPath)}`));
-                break;
-            } catch (error) {
-                console.error(chalk.yellow(`Could not parse Vite config: ${error.message}`));
-            }
-        }
-    }
-
-    // Get environment variables from .env file to check for BASE_URL
-    let basePath = null;
-    const envPath = path.join(targetDir, '.env');
-    if (fs.existsSync(envPath)) {
-        const envContent = await fs.readFile(envPath, 'utf8');
-        const baseUrlMatch = envContent.match(/BASE_URL=([^\n]+)/);
-        const basePathMatch = envContent.match(/BASE_PATH=([^\n]+)/);
-
-        if (baseUrlMatch && baseUrlMatch[1]) {
-            basePath = baseUrlMatch[1].trim();
-        } else if (basePathMatch && basePathMatch[1]) {
-            basePath = basePathMatch[1].trim();
-        }
-    }
-
-    // Use basePath from Vite config if found
-    if (viteConfig?.base && !basePath) {
-        basePath = viteConfig.base;
-    }
-
-    // Clean up basePath if it exists
-    if (basePath) {
-        // Remove quotes if present
-        basePath = basePath.replace(/^['"](.*)['"]$/, '$1');
-
-        // Make sure it starts with '/' and doesn't end with '/'
-        if (!basePath.startsWith('/')) {
-            basePath = '/' + basePath;
-        }
-        if (basePath.endsWith('/') && basePath.length > 1) {
-            basePath = basePath.slice(0, -1);
-        }
-
-        // Special case - if it's just "/" then we don't need a basePath
-        if (basePath === '/') {
-            basePath = null;
-        }
-    }
-
-    // Create next.config.mjs content with appropriate settings
-    const nextConfigContent = `/** @type {import('next').NextConfig} */
+        configContent = `/** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Outputs a Single-Page Application (SPA).
-  distDir: './dist', // Changes the build output directory to \`./dist/\`.${basePath ? `\n  basePath: '${basePath}', // Sets the base path` : ''}${viteConfig?.publicDir ? `\n  // Note: Next.js uses 'public' directory for static assets` : ''}
-  
-  // Configure additional settings as needed:
-  // images: { unoptimized: true }, // If you're using static export
-  // experimental: { appDir: true }, // Enable App Router (already default in Next.js 13+)
+  compiler: {
+    styledComponents: true,
+  },
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    optimizeCss: true,
+  },
 }
 
-export default nextConfig;
-`;
+export default nextConfig;`;
+    } else if (projectSetup.cssFramework === 'emotion') {
+        // For emotion, create a cache file
+        await createEmotionCache(targetDir, projectSetup.usesTypeScript);
 
-    // Write next.config.mjs file
-    await fs.writeFile(nextConfigPath, nextConfigContent);
-    console.log(chalk.green('√ Created next.config.mjs'));
+        configContent = `/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    optimizeCss: true,
+  },
+}
 
-    console.log(chalk.green('✓ Step 2 completed'));
+export default nextConfig;`;
+    } else if (projectSetup.cssFramework === 'mui') {
+        // For MUI, create a theme file
+        await createMuiTheme(targetDir, projectSetup.usesTypeScript);
+
+        configContent = `/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    optimizeCss: true,
+  },
+}
+
+export default nextConfig;`;
+    } else {
+        // Default config (works for Tailwind, Chakra, and projects without CSS frameworks)
+        configContent = `/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    optimizeCss: true,
+  },
+}
+
+export default nextConfig;`;
+    }
+
+    await fs.writeFile(nextConfigPath, configContent);
+    console.log(chalk.green('√ Created next.config.js'));
+
+    await createGitIgnore(targetDir);
+
+    console.log(chalk.green('✓ Step 3 completed'));
     return true;
 }
 
-function parseViteConfig(configContent) {
-    const config = {
-        base: null,
-        publicDir: null,
-        outDir: null
-    };
+async function createGitIgnore(targetDir) {
+    const gitignorePath = path.join(targetDir, '.gitignore');
+    let gitignoreContent = '';
+    let gitignoreUpdated = false;
 
-    // Extract base path
-    const baseMatch = configContent.match(/base:\s*['"]([^'"]+)['"]/);
-    if (baseMatch) {
-        config.base = baseMatch[1];
+    // Create if doesn't exist
+    if (fs.existsSync(gitignorePath)) {
+        gitignoreContent = await fs.readFile(gitignorePath, 'utf8');
     }
 
-    // Extract public directory
-    const publicDirMatch = configContent.match(/publicDir:\s*['"]([^'"]+)['"]/);
-    if (publicDirMatch) {
-        config.publicDir = publicDirMatch[1];
+    // Add Next.js related entries
+    const nextEntries = [
+        '.next',
+        'next-env.d.ts',
+        '.vercel',
+        '.env*.local'
+    ];
+
+    const missingEntries = nextEntries.filter(entry => !gitignoreContent.includes(entry));
+
+    if (missingEntries.length > 0) {
+        gitignoreContent += '\n# Next.js\n' + missingEntries.join('\n') + '\n';
+        gitignoreUpdated = true;
     }
 
-    // Extract output directory
-    const outDirMatch = configContent.match(/(?:outDir|build\.outDir):\s*['"]([^'"]+)['"]/);
-    if (outDirMatch) {
-        config.outDir = outDirMatch[1];
+    if (gitignoreUpdated) {
+        await fs.writeFile(gitignorePath, gitignoreContent);
+        console.log(chalk.green('√ Updated .gitignore with Next.js entries'));
     }
+}
 
-    return config;
+async function createStyledComponentsRegistry(targetDir, usesTypeScript) {
+    const ext = usesTypeScript ? 'tsx' : 'jsx';
+    const libDir = path.join(targetDir, 'src', 'lib');
+    await fs.ensureDir(libDir);
+
+    const registryPath = path.join(libDir, `styled-components-registry.${ext}`);
+    const registryContent = `'use client';
+
+import React, { useState } from 'react';
+import { useServerInsertedHTML } from 'next/navigation';
+import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+
+export function useStyledComponentsRegistry() {
+  const [styledComponentsStyleSheet] = useState(() => new ServerStyleSheet());
+
+  useServerInsertedHTML(() => {
+    const styles = styledComponentsStyleSheet.getStyleElement();
+    styledComponentsStyleSheet.instance.clearTag();
+    return <>{styles}</>;
+  });
+
+  if (typeof window !== 'undefined') return { styles: null, StyleProvider: React.Fragment };
+
+  return {
+    styles: null,
+    StyleProvider: ({ children }) => (
+      <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>
+        {children}
+      </StyleSheetManager>
+    ),
+  };
+}`;
+
+    await fs.writeFile(registryPath, registryContent);
+    console.log(chalk.green(`√ Created styled-components registry in src/lib/styled-components-registry.${ext}`));
+}
+
+async function createEmotionCache(targetDir, usesTypeScript) {
+    const ext = usesTypeScript ? 'tsx' : 'jsx';
+    const libDir = path.join(targetDir, 'src', 'lib');
+    await fs.ensureDir(libDir);
+
+    const cachePath = path.join(libDir, `emotion-cache.${ext}`);
+    const cacheContent = `'use client';
+
+import { useState } from 'react';
+import createCache from '@emotion/cache';
+import { useServerInsertedHTML } from 'next/navigation';
+
+export const useEmotionCache = () => {
+  const [cache] = useState(() => {
+    const cache = createCache({ key: 'css' });
+    cache.compat = true;
+    return cache;
+  });
+
+  useServerInsertedHTML(() => {
+    const extractedStyles = cache.extract();
+    if (extractedStyles.length === 0) {
+      return null;
+    }
+    return (
+      <style
+        data-emotion={cache.key}
+        dangerouslySetInnerHTML={{
+          __html: extractedStyles,
+        }}
+      />
+    );
+  });
+
+  return cache;
+};`;
+
+    await fs.writeFile(cachePath, cacheContent);
+    console.log(chalk.green(`√ Created emotion cache in src/lib/emotion-cache.${ext}`));
+}
+
+async function createMuiTheme(targetDir, usesTypeScript) {
+    const ext = usesTypeScript ? 'ts' : 'js';
+    const libDir = path.join(targetDir, 'src', 'lib');
+    await fs.ensureDir(libDir);
+
+    const themePath = path.join(libDir, `mui-theme.${ext}`);
+    const themeContent = `import { createTheme } from '@mui/material/styles';
+
+export const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#9c27b0',
+    },
+  },
+  typography: {
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
+});`;
+
+    await fs.writeFile(themePath, themeContent);
+    console.log(chalk.green(`√ Created MUI theme in src/lib/mui-theme.${ext}`));
 } 
