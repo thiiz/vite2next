@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { program } from 'commander';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
@@ -207,7 +208,7 @@ async function main() {
         program
             .name('vite2next')
             .description('CLI to migrate Vite projects to Next.js')
-            .version('1.0.0')
+            .version('1.0.8')
             .argument('[project-directory]', 'Directory of the Vite project to migrate', '.')
             .option('-y, --yes', 'Skip confirmation prompts', false)
             .option('--skip-install', 'Skip installing dependencies', false)
