@@ -80,7 +80,7 @@ export async function updateTsConfig(targetDir) {
             tsConfig.include = [];
         }
 
-        const includeEntries = ['./dist/types/**/*.ts', './next-env.d.ts'];
+        const includeEntries = ['./dist/types/**/*.ts', './next-env.d.ts', './src/**/*.ts', './src/**/*.tsx'];
         let includeUpdated = false;
 
         for (const entry of includeEntries) {

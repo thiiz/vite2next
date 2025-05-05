@@ -208,7 +208,7 @@ async function main() {
         program
             .name('vite2next')
             .description('CLI to migrate Vite projects to Next.js')
-            .version('1.0.9')
+            .version('1.0.10')
             .argument('[project-directory]', 'Directory of the Vite project to migrate', '.')
             .option('-y, --yes', 'Skip confirmation prompts', false)
             .option('--skip-install', 'Skip installing dependencies', false)
