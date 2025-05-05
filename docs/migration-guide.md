@@ -153,7 +153,61 @@ If you get a "Can't resolve" error, double-check:
 2. The correct casing of the filename (App.jsx vs app.jsx)
 3. The file extension is included in the import path
 
-### Step 6: Update Static Image Imports
+### Step 6: Converting App.css to Tailwind CSS (Optional)
+
+Next.js works well with Tailwind CSS, which is a utility-first CSS framework. If you have an App.css file in your Vite project, you can convert those styles to inline Tailwind CSS classes:
+
+1. Install Tailwind CSS in your Next.js project:
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+2. Configure your tailwind.config.js:
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+3. Add Tailwind directives to your globals.css:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+4. Run our built-in App.css to Tailwind CSS converter:
+
+```bash
+vite2next --tailwind
+```
+
+This will:
+- Find your App.css file
+- Convert CSS rules to equivalent Tailwind CSS classes using the css-to-tailwindcss package
+- Update components using these CSS classes with inline Tailwind classes
+- Create a backup of your App.css file
+- Remove the original App.css file
+
+The conversion uses the [css-to-tailwindcss](https://www.npmjs.com/package/css-to-tailwindcss) package which offers comprehensive conversion capabilities for most CSS properties, respecting your Tailwind configuration.
+
+5. Manually review the converted components to ensure the styling is preserved correctly.
+
+### Step 7: Update Static Image Imports
 
 Next.js handles image imports differently:
 
@@ -169,7 +223,7 @@ import logo from '../public/logo.png'
 
 You can later optimize images using Next.js's `<Image>` component.
 
-### Step 7: Migrate Environment Variables
+### Step 8: Migrate Environment Variables
 
 - Change all `VITE_` prefixes to `NEXT_PUBLIC_`
 - Update environment references:
@@ -199,7 +253,7 @@ const nextConfig = {
 }
 ```
 
-### Step 8: Update Scripts
+### Step 9: Update Scripts
 
 In `package.json`:
 
@@ -220,7 +274,7 @@ next-env.d.ts
 dist
 ```
 
-### Step 9: Clean Up Vite Files
+### Step 10: Clean Up Vite Files
 
 After your Next.js app is working properly, you should clean up Vite-specific files:
 
@@ -236,7 +290,7 @@ Uninstall Vite dependencies:
 npm uninstall vite @vitejs/plugin-react
 ```
 
-### Step 10: Complete App Router Migration
+### Step 11: Complete App Router Migration
 
 Once your app is running successfully with the catch-all route, you can fully migrate to the Next.js App Router structure. Next.js 13+ uses the App Router (app directory) instead of the Pages Router (pages directory).
 

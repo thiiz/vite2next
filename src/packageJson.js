@@ -2,84 +2,51 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 
-export async function updatePackageJson(targetDir) {
-    console.log(chalk.blue('Step 9: Updating package.json scripts...'));
+export async function updatePackageJson(targetDir, projectSetup) {
+    console.log(chalk.blue('Step 9: Updating package.json...'));
 
     const packageJsonPath = path.join(targetDir, 'package.json');
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
 
-    // Initialize scripts object if it doesn't exist
+    console.log(chalk.gray('Updating scripts for Next.js...'));
+
     if (!packageJson.scripts) {
         packageJson.scripts = {};
     }
 
-    // Update or add Next.js scripts
-    let updated = false;
+    // Update scripts for Next.js
+    packageJson.scripts.dev = 'next dev';
+    packageJson.scripts.build = 'next build';
+    packageJson.scripts.start = 'next start';
+    packageJson.scripts.lint = packageJson.scripts.lint || 'next lint';
 
-    // Update dev script
-    if (packageJson.scripts.dev && !packageJson.scripts.dev.includes('next dev')) {
-        console.log(chalk.gray(`Replacing dev script: "${packageJson.scripts.dev}" → "next dev"`));
-        packageJson.scripts.dev = 'next dev';
-        updated = true;
-    } else if (!packageJson.scripts.dev) {
-        packageJson.scripts.dev = 'next dev';
-        console.log(chalk.green('√ Added dev script: "next dev"'));
-        updated = true;
+    // Add browserslist config if it doesn't exist
+    if (!packageJson.browserslist) {
+        packageJson.browserslist = [
+            "last 2 versions",
+            "> 1%",
+            "not dead"
+        ];
     }
 
-    // Update build script
-    if (packageJson.scripts.build && !packageJson.scripts.build.includes('next build')) {
-        console.log(chalk.gray(`Replacing build script: "${packageJson.scripts.build}" → "next build"`));
-        packageJson.scripts.build = 'next build';
-        updated = true;
-    } else if (!packageJson.scripts.build) {
-        packageJson.scripts.build = 'next build';
-        console.log(chalk.green('√ Added build script: "next build"'));
-        updated = true;
+    // Set or update the type field if using TypeScript
+    if (projectSetup.usesTypeScript) {
+        packageJson.type = "module";
     }
 
-    // Update start script
-    if (packageJson.scripts.start && !packageJson.scripts.start.includes('next start')) {
-        console.log(chalk.gray(`Replacing start script: "${packageJson.scripts.start}" → "next start"`));
-        packageJson.scripts.start = 'next start';
-        updated = true;
-    } else if (!packageJson.scripts.start) {
-        packageJson.scripts.start = 'next start';
-        console.log(chalk.green('√ Added start script: "next start"'));
-        updated = true;
+    // Set correct engines field for Next.js
+    if (!packageJson.engines) {
+        packageJson.engines = {};
     }
+    packageJson.engines.node = ">=18.17.0";
 
-    // Add or update .gitignore for Next.js files
-    const gitignorePath = path.join(targetDir, '.gitignore');
-    let gitignoreContent = '';
-    let gitignoreUpdated = false;
+    // Remove Vite-specific entries
+    delete packageJson.scripts['dev:host'];
+    delete packageJson.scripts['vite'];
 
-    // Create if doesn't exist
-    if (fs.existsSync(gitignorePath)) {
-        gitignoreContent = await fs.readFile(gitignorePath, 'utf8');
-    }
+    await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-    // Add Next.js related entries
-    const nextEntries = ['.next', 'next-env.d.ts', 'dist'];
-    for (const entry of nextEntries) {
-        if (!gitignoreContent.includes(entry)) {
-            gitignoreContent += `\n# Next.js\n${entry}\n`;
-            gitignoreUpdated = true;
-        }
-    }
-
-    if (gitignoreUpdated) {
-        await fs.writeFile(gitignorePath, gitignoreContent);
-        console.log(chalk.green('√ Updated .gitignore with Next.js entries'));
-    }
-
-    if (updated) {
-        await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
-        console.log(chalk.green('√ Updated package.json scripts'));
-    } else {
-        console.log(chalk.yellow('i No changes needed for package.json scripts'));
-    }
-
-    console.log(chalk.green('✓ Step 8 completed'));
+    console.log(chalk.green('√ Updated package.json'));
+    console.log(chalk.green('✓ Step 9 completed'));
     return true;
 } 
