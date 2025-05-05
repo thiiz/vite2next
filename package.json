@@ -2,14 +2,14 @@
     "name": "vite2next",
     "version": "1.0.4",
     "description": "Automated tool to migrate Vite projects to Next.js",
-    "main": "./src/cli.js",
+    "main": "src/cli.js",
     "type": "module",
     "bin": {
-        "vite2next": "./src/cli.js"
+        "vite2next": "src/cli.js"
     },
     "scripts": {
-        "start": "node ./src/cli.js",
-        "dev": "node ./src/cli.js"
+        "start": "node src/cli.js",
+        "dev": "node src/cli.js"
     },
     "exports": {
         ".": "./src/cli.js",
